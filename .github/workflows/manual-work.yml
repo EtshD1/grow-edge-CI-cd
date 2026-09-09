@@ -2,16 +2,15 @@ name: Manual Workflow
 
 on:
   workflow_dispatch:
-    options:
-      inputs:
-        environment:
-          description: "Env to deploy to"
-          required: true
-          default: staging
-          type: choice
-          options:
-            - staging
-            - production
+    inputs:
+      environment:
+        description: "Env to deploy to"
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
 
 jobs:
   deploy:
