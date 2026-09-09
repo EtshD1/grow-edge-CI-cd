@@ -1,0 +1,109 @@
+name: Jobs, Steps, and Artifacts
+
+on:
+  workflow_dispatch:
+
+
+jobs:
+  job_1:
+    runs-on: ubuntu-latest
+    name: job_1
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Generate data
+        run: node scripts/generate-data.js
+
+      - name: Upload numbers artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: numbers
+          path: data/numbers.json 
+          
+  job_2:
+    needs: job_1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Download numbers artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: numbers
+          path: data
+
+      - name: Compute sum
+        run: node scripts/compute-sum.js
+
+      - name: Upload sum artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sum-result
+          path: data/sum.json
+
+  job_3:
+    needs: job_1
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Download numbers artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: numbers
+          path: data
+
+      - name: Compute stats
+        run: node scripts/compute-stats.js
+
+      - name: Upload stats artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: stats-result
+          path: data/stats.json
+
+  job_4:
+    needs: [job_2, job_3]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Download sum artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: sum-result
+          path: data
+
+      - name: Download stats artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: stats-result
+          path: data
+
+      - name: Combine results
+        run: node scripts/combine-results.js
